@@ -1,0 +1,18 @@
+{
+    "sourceFile": "lib/features/home/tabs/fav_tab.dart",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1785499222694,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1785499222694,
+            "name": "Commit-0",
+            "content": "import 'package:flutter/material.dart';\n\nclass FavTab extends StatelessWidget {\n  const FavTab({super.key});\n\n  @override\n  Widget build(BuildContext context) {\n    return const Placeholder();\n  }\n}\n"
+        }
+    ]
+}
