@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:evently/models/event_category.dart';
 
 class EventModel {
@@ -23,9 +24,17 @@ class EventModel {
       title: json['title'],
       description: json['description'],
       isFavorite: json['isFavorite'],
-      date: json['date'],
-      category: json['category'],
+      date: _parseDate(json['date']),
+      category: EventCategory.fromId(json['category']),
     );
+  }
+
+  static DateTime _parseDate(dynamic value) {
+    if (value is Timestamp) return value.toDate();
+    if (value is DateTime) return value;
+    if (value is String) return DateTime.tryParse(value) ?? DateTime.now();
+    if (value is int) return DateTime.fromMillisecondsSinceEpoch(value);
+    return DateTime.now();
   }
 
   Map<String, dynamic> toJson() {
@@ -35,7 +44,7 @@ class EventModel {
       "description": description,
       "isFavorite": isFavorite,
       "date": date,
-      "category": category,
+      "category": category.id.toString(),
     };
   }
 

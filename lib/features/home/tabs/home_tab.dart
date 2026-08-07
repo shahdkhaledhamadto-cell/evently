@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:evently/core/firebase_functions.dart';
 import 'package:evently/features/home/widgets/category_chip.dart';
 import 'package:evently/features/home/widgets/event_card.dart';
 import 'package:evently/models/event_category.dart';
@@ -8,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class HomeTab extends StatefulWidget {
-  const HomeTab({super.key});
+  HomeTab({super.key});
 
   @override
   State<HomeTab> createState() => _HomeTabState();
@@ -107,9 +109,8 @@ class _HomeTabState extends State<HomeTab> {
               category: EventCategory.filters[index],
               isSelected: index == selectedFilter,
               onTap: () {
-                setState(() {
-                  selectedFilter = index;
-                });
+                selectedFilter = index;
+                setState(() {});
               },
             ),
             separatorBuilder: (context, index) => const SizedBox(width: 8),
@@ -117,18 +118,40 @@ class _HomeTabState extends State<HomeTab> {
           ),
         ),
         Expanded(
-          child: ListView.separated(
-            padding: const EdgeInsets.all(16),
-            itemBuilder: (context, index) => EventCard(
-              event: events[index],
-              onFavoriteTap: () {
-                setState(() {
-                  events[index].isFavorite = !events[index].isFavorite;
-                });
-              },
+          child: StreamBuilder<QuerySnapshot<EventModel>>(
+            stream: FirebaseFunctions.getEvents(
+              EventCategory.filters[selectedFilter].id,
             ),
-            separatorBuilder: (context, index) => const SizedBox(height: 16),
-            itemCount: events.length,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError == true) {
+                return Center(child: Text("Something went wrong"));
+              }
+
+              List<EventModel> data =
+                  snapshot.data?.docs.map((e) {
+                    return e.data();
+                  }).toList() ??
+                  [];
+
+              if (data.isEmpty) {
+                return Center(child: Text("No events found"));
+              }
+              return ListView.separated(
+                padding: const EdgeInsets.all(16),
+                itemBuilder: (context, index) => EventCard(
+                  event: data[index],
+                  onFavoriteTap: () {
+                    data[index].isFavorite = !data[index].isFavorite;
+                    FirebaseFunctions.updateEvent(data[index]);
+                  },
+                ),
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: 16),
+                itemCount: data.length,
+              );
+            },
           ),
         ),
       ],

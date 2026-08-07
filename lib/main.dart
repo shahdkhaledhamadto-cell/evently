@@ -6,13 +6,16 @@ import 'package:evently/features/home/home_screen.dart';
 import 'package:evently/features/login/login.dart';
 import 'package:evently/features/onboarding/onboarding_screen.dart';
 import 'package:evently/features/register/register_screen.dart';
+import 'package:evently/firebase_options.dart';
 import 'package:evently/providers/theme_provider.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(
     EasyLocalization(
       supportedLocales: [Locale('en'), Locale('ar')],

@@ -13,6 +13,17 @@ class EventCategory {
     required this.imagePath,
   });
 
+  static EventCategory fromId(String? id) {
+    return categories.firstWhere((c) => c.id == id);
+  }
+
+  static EventCategory? tryFromId(String? id) {
+    for (final c in filters) {
+      if (c.id == id) return c;
+    }
+    return null;
+  }
+
   static const EventCategory all = EventCategory(
     id: "all",
     nameKey: "all",

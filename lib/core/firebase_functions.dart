@@ -21,4 +21,18 @@ class FirebaseFunctions {
     model.id = docRef.id;
     docRef.set(model);
   }
+
+  static updateEvent(EventModel model) {
+    var collection = createEventsCollection();
+
+    collection.doc(model.id).update(model.toJson());
+  }
+
+  static Stream<QuerySnapshot<EventModel>> getEvents(String id) {
+    var collection = createEventsCollection();
+    if (id == "all") {
+      return collection.snapshots();
+    }
+    return collection.where("category", isEqualTo: id).snapshots();
+  }
 }
