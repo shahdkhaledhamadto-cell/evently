@@ -3,11 +3,15 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 1,
             "patches": [
                 {
                     "date": 1786097091407,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1786706175633,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -6,8 +6,9 @@\n import 'package:evently/features/home/widgets/category_chip.dart';\n import 'package:evently/models/event_category.dart';\n import 'package:evently/models/event_model.dart';\n import 'package:evently/providers/theme_provider.dart';\n+import 'package:firebase_auth/firebase_auth.dart';\n import 'package:flutter/material.dart';\n import 'package:provider/provider.dart';\n \n class AddEventScreen extends StatefulWidget {\n@@ -202,8 +203,9 @@\n     FirebaseFunctions.addEvent(\n       EventModel(\n         title: titleController.text.trim(),\n         description: descriptionController.text.trim(),\n+        userId: FirebaseAuth.instance.currentUser!.uid,\n         date: DateTime(\n           selectedDate!.year,\n           selectedDate!.month,\n           selectedDate!.day,\n"
                 }
             ],
             "date": 1786097091407,

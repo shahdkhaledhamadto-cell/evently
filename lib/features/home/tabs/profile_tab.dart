@@ -1,6 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:evently/core/my_provider.dart';
 import 'package:evently/features/login/login.dart';
 import 'package:evently/providers/theme_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -10,6 +12,7 @@ class ProfileTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var provider = Provider.of<ThemeProvider>(context);
+    var userprovider = Provider.of<MyProvider>(context);
     var isDark = provider.themeMode == ThemeMode.dark;
 
     return SingleChildScrollView(
@@ -29,7 +32,7 @@ class ProfileTab extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            "John Safwat",
+            userprovider.userModel?.name ?? "",
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.titleLarge!.copyWith(
               fontSize: 24,
@@ -38,7 +41,7 @@ class ProfileTab extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            "johnsafwat.route@gmail.com",
+            userprovider.userModel?.email ?? "",
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.titleMedium,
           ),
@@ -69,7 +72,9 @@ class ProfileTab extends StatelessWidget {
           const SizedBox(height: 16),
           ProfileOptionCard(
             title: "logout".tr(),
-            onTap: () {
+            onTap: () async {
+              print(FirebaseAuth.instance.currentUser!.uid);
+              await FirebaseAuth.instance.signOut();
               Navigator.pushNamedAndRemoveUntil(
                 context,
                 LoginScreen.routeName,

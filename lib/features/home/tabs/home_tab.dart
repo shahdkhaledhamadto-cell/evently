@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:evently/core/firebase_functions.dart';
+import 'package:evently/core/my_provider.dart';
 import 'package:evently/features/home/widgets/category_chip.dart';
 import 'package:evently/features/home/widgets/event_card.dart';
 import 'package:evently/models/event_category.dart';
@@ -22,12 +23,7 @@ class _HomeTabState extends State<HomeTab> {
   @override
   Widget build(BuildContext context) {
     var provider = Provider.of<ThemeProvider>(context);
-    var selectedCategory = EventCategory.filters[selectedFilter];
-    var events = selectedCategory.id == EventCategory.all.id
-        ? EventModel.dummyEvents
-        : EventModel.dummyEvents
-              .where((event) => event.category.id == selectedCategory.id)
-              .toList();
+    var userProvider = Provider.of<MyProvider>(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,7 +42,7 @@ class _HomeTabState extends State<HomeTab> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      "John Safwat",
+                      userProvider.userModel?.name ?? "",
                       style: Theme.of(
                         context,
                       ).textTheme.titleLarge!.copyWith(fontSize: 24),

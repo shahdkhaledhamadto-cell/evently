@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:evently/core/firebase_functions.dart';
 import 'package:evently/core/widgets/custom_text_form_field.dart';
 import 'package:evently/features/home/widgets/event_card.dart';
 import 'package:evently/models/event_model.dart';
@@ -19,55 +20,66 @@ class _FavTabState extends State<FavTab> {
   @override
   Widget build(BuildContext context) {
     var provider = Provider.of<ThemeProvider>(context);
-    var events = EventModel.dummyEvents
-        .where(
-          (event) =>
-              event.isFavorite &&
-              event.title.toLowerCase().contains(searchText.toLowerCase()),
-        )
-        .toList();
 
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: CustomTextFormField(
-            hintText: "search_hint".tr(),
-            suffixIcon: Icon(
-              Icons.search,
-              color: provider.colors.primaryColor(),
+    return StreamBuilder(
+      stream: FirebaseFunctions.getfavEvents(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError == true) {
+          return Center(child: Text("Something went wrong"));
+        }
+
+        List<EventModel> data =
+            snapshot.data?.docs.map((e) {
+              return e.data();
+            }).toList() ??
+            [];
+
+        if (data.isEmpty) {
+          return Center(
+            child: Text(
+              "no_favorites".tr(),
+              style: Theme.of(context).textTheme.titleMedium,
             ),
-            onChanged: (value) {
-              setState(() {
-                searchText = value;
-              });
-            },
-          ),
-        ),
-        Expanded(
-          child: events.isEmpty
-              ? Center(
-                  child: Text(
-                    "no_favorites".tr(),
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                )
-              : ListView.separated(
-                  padding: const EdgeInsets.all(16),
-                  itemBuilder: (context, index) => EventCard(
-                    event: events[index],
-                    onFavoriteTap: () {
-                      setState(() {
-                        events[index].isFavorite = !events[index].isFavorite;
-                      });
-                    },
-                  ),
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(height: 16),
-                  itemCount: events.length,
+          );
+        }
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: CustomTextFormField(
+                hintText: "search_hint".tr(),
+                suffixIcon: Icon(
+                  Icons.search,
+                  color: provider.colors.primaryColor(),
                 ),
-        ),
-      ],
+                onChanged: (value) {
+                  setState(() {
+                    searchText = value;
+                  });
+                },
+              ),
+            ),
+            Expanded(
+              child: ListView.separated(
+                padding: const EdgeInsets.all(16),
+                itemBuilder: (context, index) => EventCard(
+                  event: data[index],
+                  onFavoriteTap: () {
+                    setState(() {
+                      data[index].isFavorite = !data[index].isFavorite;
+                    });
+                  },
+                ),
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: 16),
+                itemCount: data.length,
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

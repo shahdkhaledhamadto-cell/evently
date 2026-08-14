@@ -6,6 +6,7 @@ class EventModel {
   final String title;
   final String description;
   final DateTime date;
+  final userId;
   final EventCategory category;
   bool isFavorite;
 
@@ -14,13 +15,15 @@ class EventModel {
     required this.title,
     required this.date,
     required this.category,
+    required this.userId,
     this.description = "",
     this.isFavorite = false,
   });
 
-  static EventModel formJson(Map<String, dynamic> json) {
+  static EventModel fromJson(Map<String, dynamic> json) {
     return EventModel(
       id: json['id'],
+      userId: json['userId'],
       title: json['title'],
       description: json['description'],
       isFavorite: json['isFavorite'],
@@ -43,6 +46,7 @@ class EventModel {
       "title": title,
       "description": description,
       "isFavorite": isFavorite,
+      "userId": userId,
       "date": date,
       "category": category.id.toString(),
     };
@@ -65,40 +69,5 @@ class EventModel {
     "Oct",
     "Nov",
     "Dec",
-  ];
-
-  static final List<EventModel> dummyEvents = [
-    EventModel(
-      id: "1",
-      title: "This is a Birthday Party",
-      date: DateTime(2026, 1, 21),
-      category: EventCategory.birthday,
-      isFavorite: true,
-    ),
-    EventModel(
-      id: "2",
-      title: "Meeting for Updating The Development Method",
-      date: DateTime(2026, 1, 22),
-      category: EventCategory.meeting,
-    ),
-    EventModel(
-      id: "3",
-      title: "Discover unique exhibitions and talents",
-      date: DateTime(2026, 1, 23),
-      category: EventCategory.exhibition,
-    ),
-    EventModel(
-      id: "4",
-      title: "Weekend cycling race with friends",
-      date: DateTime(2026, 1, 24),
-      category: EventCategory.sport,
-      isFavorite: true,
-    ),
-    EventModel(
-      id: "5",
-      title: "Monthly book club discussion",
-      date: DateTime(2026, 1, 25),
-      category: EventCategory.bookClub,
-    ),
   ];
 }

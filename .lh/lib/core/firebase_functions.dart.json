@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 13,
+            "activePatchIndex": 14,
             "patches": [
                 {
                     "date": 1786096282532,
@@ -60,6 +60,10 @@
                 {
                     "date": 1786106258000,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -23,9 +23,9 @@\n   }\n \n   static Future<QuerySnapshot<EventModel>> getEvents(String id) {\n     var collection = createEventsCollection();\n-    if (id == \"All\") {\n+    if (id == \"all\") {\n       return collection.get();\n     }\n     return collection.where(\"category\", isEqualTo: id).get();\n   }\n"
+                },
+                {
+                    "date": 1786697370965,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -34,5 +34,11 @@\n       return collection.snapshots();\n     }\n     return collection.where(\"category\", isEqualTo: id).snapshots();\n   }\n+\n+\n+\n+  void register(String name , String email,String password){\n+\n+  }\n }\n"
                 }
             ],
             "date": 1786096282532,

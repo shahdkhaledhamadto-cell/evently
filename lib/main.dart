@@ -1,4 +1,8 @@
+import 'dart:ui';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:evently/core/my_provider.dart';
 import 'package:evently/core/my_theme_data.dart';
 import 'package:evently/features/add_event/add_event_screen.dart';
 import 'package:evently/features/forget_password/forget_password_screen.dart';
@@ -9,6 +13,7 @@ import 'package:evently/features/register/register_screen.dart';
 import 'package:evently/firebase_options.dart';
 import 'package:evently/providers/theme_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -16,13 +21,29 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  const fatalError = true;
+  FlutterError.onError = (errorDetails) {
+    if (fatalError) {
+      FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+    }
+  };
+  PlatformDispatcher.instance.onError = (error, stack) {
+    if (fatalError) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    }
+    return true;
+  };
   runApp(
     EasyLocalization(
       supportedLocales: [Locale('en'), Locale('ar')],
       path: 'assets/translations',
       fallbackLocale: Locale('en'),
-      child: ChangeNotifierProvider(
-        create: (context) => ThemeProvider(),
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (context) => ThemeProvider()),
+          ChangeNotifierProvider(create: (context) => MyProvider()),
+        ],
         child: MyApp(),
       ),
     ),
@@ -35,6 +56,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var provider = Provider.of<ThemeProvider>(context);
+    var userProvider = Provider.of<MyProvider>(context);
+    FirebaseCrashlytics.instance.recordError(
+      Exception(),
+      StackTrace.fromString("stackTraceString"),
+    );
     return MaterialApp(
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
@@ -50,7 +76,9 @@ class MyApp extends StatelessWidget {
         HomeScreen.routeName: (c) => HomeScreen(),
         AddEventScreen.routeName: (c) => AddEventScreen(),
       },
-      initialRoute: HomeScreen.routeName,
+      initialRoute: userProvider.firebaseUser != null
+          ? HomeScreen.routeName
+          : LoginScreen.routeName,
       debugShowCheckedModeBanner: false,
     );
   }

@@ -7,6 +7,7 @@ import 'package:evently/features/home/widgets/category_chip.dart';
 import 'package:evently/models/event_category.dart';
 import 'package:evently/models/event_model.dart';
 import 'package:evently/providers/theme_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -203,6 +204,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
       EventModel(
         title: titleController.text.trim(),
         description: descriptionController.text.trim(),
+        userId: FirebaseAuth.instance.currentUser!.uid,
         date: DateTime(
           selectedDate!.year,
           selectedDate!.month,
