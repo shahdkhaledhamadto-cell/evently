@@ -1,26 +1,44 @@
 {
   "project_info": {
-    "project_number": "604989966030",
-    "project_id": "evenly-c19",
-    "storage_bucket": "evenly-c19.firebasestorage.app"
+    "project_number": "468704356475",
+    "project_id": "evently-shahd",
+    "storage_bucket": "evently-shahd.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:604989966030:android:b1a614099dfac6f795329f",
+        "mobilesdk_app_id": "1:468704356475:android:6b7ef678edd87787d41ade",
         "android_client_info": {
           "package_name": "com.example.evently"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "468704356475-m2v6apbh0sbi04g9ka0rgjvu8d3p0rmt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.evently",
+            "certificate_hash": "deb1370732553296f756115cab17b6eab117aef2"
+          }
+        },
+        {
+          "client_id": "468704356475-mvdfdh8fi2u75ng042tbmh0uc6mm34d2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyByL7x_dH69yFgimliLxjxy0dN0ljxWUZs"
+          "current_key": "AIzaSyDw4CseO-2E6ZqxOxYy_4eBnmCTrvgzMwg"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "468704356475-mvdfdh8fi2u75ng042tbmh0uc6mm34d2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

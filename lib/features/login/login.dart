@@ -1,4 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:evently/core/firebase_functions.dart';
 import 'package:evently/core/my_provider.dart';
 import 'package:evently/core/validators.dart';
@@ -9,6 +11,7 @@ import 'package:evently/core/widgets/or_divider.dart';
 import 'package:evently/features/forget_password/forget_password_screen.dart';
 import 'package:evently/features/home/home_screen.dart';
 import 'package:evently/features/register/register_screen.dart';
+import 'package:evently/models/user_model.dart';
 import 'package:evently/providers/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -16,12 +19,48 @@ import 'package:provider/provider.dart';
 
 class LoginScreen extends StatelessWidget {
   static const String routeName = "login";
+
+  final username = TextEditingController();
+  final password = TextEditingController();
+  final formKey = GlobalKey<FormState>();
+
   LoginScreen({super.key});
 
-  var username = TextEditingController();
-  var password = TextEditingController();
+  Future<UserCredential?> signInWithGoogle() async {
+    try {
+      final GoogleSignIn googleSignIn = GoogleSignIn.instance;
+      await googleSignIn.initialize();
 
-  var formKey = GlobalKey<FormState>();
+      final GoogleSignInAccount googleUser = await googleSignIn.authenticate();
+
+      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
+
+      final credential = GoogleAuthProvider.credential(
+        idToken: googleAuth.idToken,
+      );
+
+      final userCredential = await FirebaseAuth.instance.signInWithCredential(
+        credential,
+      );
+
+      // احفظي بيانات المستخدم في Firestore (تحديث أو إنشاء)
+      debugPrint('Saving user to Firestore: ${userCredential.user!.uid}, name: ${userCredential.user!.displayName}');
+      FirebaseFunctions.addUserToDatabase(
+        UserModel(
+          id: userCredential.user!.uid,
+          name: userCredential.user!.displayName ?? "",
+          email: userCredential.user!.email ?? "",
+          createdAt: DateTime.now().toString(),
+        ),
+      );
+
+      return userCredential;
+    } catch (e) {
+      debugPrint('Google Sign-In Error: $e');
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var provider = Provider.of<ThemeProvider>(context);
@@ -95,15 +134,16 @@ class LoginScreen extends StatelessWidget {
                       FirebaseFunctions.login(
                         username.text.trim(),
                         password.text,
-                        () async {
+                            () async {
                           await userProvider.initUser();
+                          if (!context.mounted) return;
                           Navigator.pushNamedAndRemoveUntil(
                             context,
                             HomeScreen.routeName,
-                            (r) => false,
+                                (r) => false,
                           );
                         },
-                        (message) {
+                            (message) {
                           Fluttertoast.showToast(
                             msg: message,
                             toastLength: Toast.LENGTH_LONG,
@@ -139,12 +179,27 @@ class LoginScreen extends StatelessWidget {
                     backgroundColor: Colors.white,
                     textStyle: Theme.of(context).textTheme.labelMedium,
                     icon: Image.asset("assets/images/image 6.png"),
-                    onPressed: () {
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        HomeScreen.routeName,
-                        (r) => false,
-                      );
+                    onPressed: () async {
+                      var result = await signInWithGoogle();
+                      if (result != null) {
+                        await userProvider.initUser();
+                        if (!context.mounted) return;
+                        Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          HomeScreen.routeName,
+                              (r) => false,
+                        );
+                      } else {
+                        if (!context.mounted) return;
+                        Fluttertoast.showToast(
+                          msg: "حصل خطأ في تسجيل الدخول بجوجل",
+                          toastLength: Toast.LENGTH_LONG,
+                          gravity: ToastGravity.BOTTOM,
+                          backgroundColor: Colors.red,
+                          textColor: Colors.white,
+                          fontSize: 16.0,
+                        );
+                      }
                     },
                   ),
                 ],
